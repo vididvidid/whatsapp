@@ -105,8 +105,8 @@ async function readCSVFile(page,filePath) {
 }
 
 async function main() {
+  const browser = await puppeteer.launch({ headless: false, args: ['--disable-notifications'] });
   try {
-    const browser = await puppeteer.launch({ headless: false, args: ['--disable-notifications'] });
     const page = await browser.newPage();
     await loginToWhatsApp(page);
 
@@ -122,10 +122,12 @@ async function main() {
     // }
 
     const csvFilePath = 'yashList.csv';
-    readCSVFile(page,csvFilePath);
+    await readCSVFile(page,csvFilePath);
 
   } catch (error) {
     console.error('Error:', error);
+  }finally{
+    await browser.close();
   }
 }
 
