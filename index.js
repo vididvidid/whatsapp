@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
+const readline = require('readline');
 
 //random value generator -- so bot can't block us (if)
 function getRandomTimeout(min = 0, max = 3000) {
@@ -36,16 +38,20 @@ async function sendMessage(page, contact, message) {
   }
   //type the name of the person
   await typeTextInElement(page, searchBar, contact);
+  await page.keyboard.press('Enter');
+  // if(flag==0){
+  //   await delay(getRandomTimeout());
+  // }
   //select the person chat
-  const person = await page.waitForSelector(`span[title="${contact}"]`, { visible: true });
-  if (!person) {
-    console.error('Person not found');
-    return;
-  }
-  //click on that person chat
-  await person.click();
-  //wait for load of the chat after cliking
-  await delay(getRandomTimeout());
+  // const person = await page.waitForSelector(`span[title="${contact}"]`, { visible: true });
+  // if (!person) {
+  //   console.error('Person not found');
+  //   return;
+  // }
+  // //click on that person chat
+  // await person.click();
+  // //wait for load of the chat after cliking
+  // await delay(getRandomTimeout());
   //search for the message input area
   const searchBarAgain = await page.$x(`//div[@class='g0rxnol2 ln8gz9je lexical-rich-text-input']/div[@role='textbox' and @data-lexical-editor='true']`);
   if (!searchBarAgain[1]) {
@@ -77,22 +83,46 @@ async function typeTextInElement(page, element, text) {
   await page.keyboard.type(text);
 }
 
-async function main() {
-  try {
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
-    await loginToWhatsApp(page);
+async function readCSVFile(page,filePath) {
+  const fileStream = fs.createReadStream(filePath);
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
+  });
 
-    const groups = ["Home Vb", "Love", "Faltu", "Fri Hariom Bhaiya"];
-
-    for (const group of groups) { 
+  for await (const group of rl) {
+    var flag=0
+    // Process each line here
+    console.log(group+"................................");
       try {
         await sendMessage(page, group, 'hello');
+        flag=1;
       } catch (error) {
         console.log(`Error occurred at ${group}: ${error.message}`);
         continue;
       }
-    }
+  }
+}
+
+async function main() {
+  try {
+    const browser = await puppeteer.launch({ headless: false, args: ['--disable-notifications'] });
+    const page = await browser.newPage();
+    await loginToWhatsApp(page);
+
+    // const groups = ["Home Vb", "Love", "Faltu", "Fri Hariom Bhaiya"];
+
+    // for (const group of groups) { 
+    //   try {
+    //     await sendMessage(page, group, 'hello');
+    //   } catch (error) {
+    //     console.log(`Error occurred at ${group}: ${error.message}`);
+    //     continue;
+    //   }
+    // }
+
+    const csvFilePath = 'yashList.csv';
+    readCSVFile(page,csvFilePath);
 
   } catch (error) {
     console.error('Error:', error);
