@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const { loginToWhatsApp, sendMessage } = require('./whatsapp');
 const { readCSVFile } = require('./file');
+const { delay, getRandomTimeout } = require('./utils');
 
 async function main() {
   const browser = await puppeteer.launch({ headless: false, args: ['--disable-notifications'] });
@@ -25,6 +26,7 @@ async function main() {
   } catch (error) {
     console.error('Error:', error);
   }finally{
+    await delay(getRandomTimeout());
     await browser.close();
   }
 }

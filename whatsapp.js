@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { delay, getRandomTimeout } = require('./utils');
 //login to whatsapp 
 async function loginToWhatsApp(page) {
     await page.goto('https://web.whatsapp.com');
@@ -46,7 +47,7 @@ async function loginToWhatsApp(page) {
     }
     const searchBarAgain2 = searchBarAgain[1];
     //type the text inside the message input area
-    const text = `${message}\n${contact}`;
+    const text = "Happy 2024! ✨ Dreams sparkle, goals rock, and love flows! Wishing you joy, health, and endless possibilities!  #NewYearNewYou";
     await typeTextInElement(page, searchBarAgain2, text);
   
     //find the send button
